@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>FindYourNIM</title>
+    <style>
+      /* Add some basic styling */
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 10px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 5px;
+        margin-right: 10px;
+      }
+
+      input[type="submit"] {
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+
+      #result-table {
+        display: none;
+        margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      #result-table th,
+      #result-table td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        text-align: left;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>FindYourNIM</h1>
+
+    <!-- Form input for NIM or Name -->
+    <form id="search-form">
+      <input
+        type="text"
+        id="nim-nama"
+        placeholder="Enter NIM or Name"
+        required
+      />
+      <input type="submit" value="Search" />
+    </form>
+
+    <!-- Result table -->
+    <table id="result-table">
+      <thead>
+        <tr>
+          <th>NIM</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      // Handle form submission
+      document
+        .getElementById("search-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          // Get the input value
+          const nimNama = document.getElementById("nim-nama").value;
+
+          // Fetch data from the Go script
+          fetch("/search", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({ "nim-nama": nimNama }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Clear previous results
+              const tbody = document.querySelector("#result-table tbody");
+              tbody.innerHTML = "";
+
+              // Populate the result table
+              data.forEach((item) => {
+                const row = document.createElement("tr");
+                const nimCell = document.createElement("td");
+                const nameCell = document.createElement("td");
+
+                // Split the item text to extract NIM and Name
+                const [nim, name] = item.text.split(" - ");
+
+                nimCell.textContent = nim;
+                nameCell.textContent = name;
+
+                row.appendChild(nimCell);
+                row.appendChild(nameCell);
+                tbody.appendChild(row);
+              });
+
+              // Display the result table
+              document.getElementById("result-table").style.display = "table";
+            })
+            .catch((error) => {
+              console.error("Error fetching data:", error);
+            });
+        });
+    </script>
+  </body>
+</html>
