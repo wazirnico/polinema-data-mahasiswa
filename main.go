@@ -9,15 +9,53 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	// Import the Viper library
 
 	_ "github.com/lib/pq" // Import the PostgreSQL driver
+	"github.com/spf13/viper"
 )
 
-// Initialize the PostgreSQL database
-func initDB() (*sql.DB, error) {
-	// Use the connection URL provided
-	connStr := "postgres://polinema_user:wXWF6xf2R811fov48txmANOz70kjhjdF@dpg-con3fg4f7o1s73fcrdg0-a.singapore-postgres.render.com/polinema"
+func loadEnvConfig() {
+	// Set the file name of the configurations file
+	viper.SetConfigFile(".env")
 
+	// Set the path to look for the configurations file
+	viper.AddConfigPath(".")
+
+	// Enable VIPER to read Environment Variables
+	viper.AutomaticEnv()
+
+	// Read the configurations file
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatalf("Error while reading config file %s", err)
+	}
+}
+
+// Initialize the PostgreSQL database
+func initDB() (*sql.DB, error) { // Use the connection URL provided
+	// connStr := "postgres://polinema_user:wXWF6xf2R811fov48txmANOz70kjhjdF@dpg-con3fg4f7o1s73fcrdg0-a.singapore-postgres.render.com/polinema"
+
+	// Use the connection URL from the environment variable
+	// dbHost := os.Getenv("DB_HOST")
+	dbHost := viper.GetString("DB_HOST")
+	// dbPort := os.Getenv("DB_PORT")
+	dbPort := viper.GetString("DB_PORT")
+	// dbName := os.Getenv("DB_NAME")
+	dbName := viper.GetString("DB_NAME")
+	// dbUser := os.Getenv("DB_USERNAME")
+	dbUser := viper.GetString("DB_USERNAME")
+	// dbPass := os.Getenv("DB_PASSWORD")
+	dbPass := viper.GetString("DB_PASSWORD")
+
+	// print all environment variables
+	fmt.Println("DB_HOST: ", dbHost)
+	fmt.Println("DB_PORT: ", dbPort)
+	fmt.Println("DB_NAME: ", dbName)
+	fmt.Println("DB_USERNAME: ", dbUser)
+	fmt.Println("DB_PASSWORD: ", dbPass)
+
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPass, dbName)
 	// Connect to PostgreSQL
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -59,6 +97,8 @@ func storeInCache(db *sql.DB, query, response string) error {
 }
 
 func main() {
+	// Load the environment variables
+	loadEnvConfig()
 	// Initialize the database
 	db, err := initDB()
 	if err != nil {
@@ -219,9 +259,9 @@ func main() {
 	// Start the HTTP server
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "443" // Default port is "443
-		//port = "8080
-		//port = "80
+		// port = "443" // Default port is "443
+		port = "8080"
+		//port = "80"
 	}
 	fmt.Printf("Server is running on port %s\n", port)
 	http.ListenAndServe(":"+port, nil)
