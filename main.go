@@ -38,24 +38,29 @@ func initDB() (*sql.DB, error) { // Use the connection URL provided
 
 	// Use the connection URL from the environment variable
 	// dbHost := os.Getenv("DB_HOST")
-	dbHost := viper.GetString("DB_HOST")
-	// dbPort := os.Getenv("DB_PORT")
-	dbPort := viper.GetString("DB_PORT")
-	// dbName := os.Getenv("DB_NAME")
-	dbName := viper.GetString("DB_NAME")
-	// dbUser := os.Getenv("DB_USERNAME")
-	dbUser := viper.GetString("DB_USERNAME")
-	// dbPass := os.Getenv("DB_PASSWORD")
-	dbPass := viper.GetString("DB_PASSWORD")
+	// dbHost := viper.GetString("DB_HOST")
+	// // dbPort := os.Getenv("DB_PORT")
+	// dbPort := viper.GetString("DB_PORT")
+	// // dbName := os.Getenv("DB_NAME")
+	// dbName := viper.GetString("DB_NAME")
+	// // dbUser := os.Getenv("DB_USERNAME")
+	// dbUser := viper.GetString("DB_USERNAME")
+	// // dbPass := os.Getenv("DB_PASSWORD")
+	// dbPass := viper.GetString("DB_PASSWORD")
 
 	// print all environment variables
-	fmt.Println("DB_HOST: ", dbHost)
-	fmt.Println("DB_PORT: ", dbPort)
-	fmt.Println("DB_NAME: ", dbName)
-	fmt.Println("DB_USERNAME: ", dbUser)
-	fmt.Println("DB_PASSWORD: ", dbPass)
+	// fmt.Println("DB_HOST: ", dbHost)
+	// fmt.Println("DB_PORT: ", dbPort)
+	// fmt.Println("DB_NAME: ", dbName)
+	// fmt.Println("DB_USERNAME: ", dbUser)
+	// fmt.Println("DB_PASSWORD: ", dbPass)
 
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPass, dbName)
+	// connStr from heroku config vars
+	connStr := os.Getenv("DATABASE_URL")
+
+	fmt.Println("connStr: ", connStr)
+
+	// connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPass, dbName)
 	// Connect to PostgreSQL
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
