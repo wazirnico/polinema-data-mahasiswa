@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"fmt"
 	"io"
@@ -147,8 +148,13 @@ func main() {
 		// Construct the URL for the external request
 		apiURL := fmt.Sprintf("https://siakad.polinema.ac.id/ajax/ms_mhs/cari_mhs?q=%s", url.QueryEscape(nimNama))
 
-		// Create an HTTP client
-		client := &http.Client{}
+		// Create an HTTP client and ssl false
+		client := &http.Client{
+			// ferify ssl false
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		}
 
 		// Create a new HTTP request to the API URL
 		req, err := http.NewRequest(http.MethodGet, apiURL, nil)
@@ -195,7 +201,7 @@ func main() {
 		}
 
 		// Parse the query parameter
-		nimNama := r.URL.Query().Get("nama")
+		nimNama := r.URL.Query().Get("q")
 
 		// set to lowercase
 		nimNama = strings.ToLower(nimNama)
@@ -217,8 +223,13 @@ func main() {
 		// Construct the URL for the external request
 		apiURL := fmt.Sprintf("https://siakad.polinema.ac.id/ajax/ms_mhs/cari_mhs?q=%s", url.QueryEscape(nimNama))
 
-		// Create an HTTP client
-		client := &http.Client{}
+		// Create an HTTP client and ssl false
+		client := &http.Client{
+			// ferify ssl false
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		}
 
 		// Create a new HTTP request to the API URL
 		req, err := http.NewRequest(http.MethodGet, apiURL, nil)
